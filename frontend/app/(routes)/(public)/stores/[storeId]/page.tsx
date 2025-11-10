@@ -210,7 +210,7 @@ export default function StoreDetailPage() {
     updateQuantity(product.id, currentQty + 1);
   };
 
-  const handleDecrement = (productId: number, e: React.MouseEvent) => {
+  const handleDecrement = (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const currentQty = cartItems[productId]?.quantity || 0;
@@ -219,7 +219,7 @@ export default function StoreDetailPage() {
     }
   };
 
-  const handleRemove = (productId: number, e: React.MouseEvent) => {
+  const handleRemove = (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     removeFromCart(productId);
