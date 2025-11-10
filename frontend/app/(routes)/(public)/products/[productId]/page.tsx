@@ -394,7 +394,7 @@ export default function ProductDetailPage() {
                 <button 
                   onClick={() => {
                     addToCart({
-                      id: parseInt(item.id),
+                      id: item.id,
                       name: item.name,
                       price: item.price,
                       image: item.image,
@@ -440,7 +440,7 @@ export default function ProductDetailPage() {
                 <button 
                   onClick={() => {
                     addToCart({
-                      id: parseInt(item.id),
+                      id: item.id,
                       name: item.name,
                       price: item.price,
                       image: item.image,
@@ -476,7 +476,7 @@ export default function ProductDetailPage() {
             onClick={() => {
               frequentlyBought.forEach(item => {
                 addToCart({
-                  id: parseInt(item.id),
+                  id: item.id,
                   name: item.name,
                   price: item.price,
                   image: item.image,
@@ -507,7 +507,7 @@ export default function ProductDetailPage() {
                 <button 
                   onClick={() => {
                     addToCart({
-                      id: parseInt(item.id),
+                      id: item.id,
                       name: item.name,
                       price: item.price,
                       image: item.image,
