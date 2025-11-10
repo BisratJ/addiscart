@@ -11,7 +11,7 @@ export default function Home() {
   const [location, setLocation] = useState('San Francisco, CA');
   const { addToCart, cartItems, updateQuantity, removeFromCart } = useCart();
 
-  const getItemQuantity = (productId: number) => {
+  const getItemQuantity = (productId: string) => {
     const item = cartItems[productId];
     return item?.quantity || 0;
   };
@@ -20,7 +20,7 @@ export default function Home() {
     e.preventDefault();
     e.stopPropagation();
     addToCart({
-      id: product.id,
+      id: String(product.id),
       name: product.name,
       price: parseFloat(product.price.replace('$', '')),
       image: product.image,
@@ -28,14 +28,14 @@ export default function Home() {
     });
   };
 
-  const handleIncrement = (productId: number, e: React.MouseEvent) => {
+  const handleIncrement = (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const quantity = getItemQuantity(productId);
     updateQuantity(productId, quantity + 1);
   };
 
-  const handleDecrement = (productId: number, e: React.MouseEvent) => {
+  const handleDecrement = (productId: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const quantity = getItemQuantity(productId);
@@ -354,7 +354,7 @@ export default function Home() {
               { id: 1004, name: 'Greek Yogurt', price: '$4.49', original: '$6.99', discount: '36% off', unit: '32 oz', image: 'https://images.unsplash.com/photo-1488477181946-6428a0291777?w=300&q=80' },
               { id: 1005, name: 'Organic Eggs', price: '$5.99', original: '$8.99', discount: '33% off', unit: 'dozen', image: 'https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=300&q=80' },
             ].map((deal) => {
-              const quantity = getItemQuantity(deal.id);
+              const quantity = getItemQuantity(String(deal.id));
               return (
                 <Link
                   key={deal.id}
@@ -391,7 +391,7 @@ export default function Home() {
                     ) : (
                       <div className="flex items-center justify-between bg-green-50 border-2 border-green-600 rounded-lg p-1">
                         <button
-                          onClick={(e) => handleDecrement(deal.id, e)}
+                          onClick={(e) => handleDecrement(String(deal.id), e)}
                           className="p-1 hover:bg-green-100 rounded transition-colors"
                         >
                           {quantity === 1 ? (
@@ -402,7 +402,7 @@ export default function Home() {
                         </button>
                         <span className="font-bold text-green-600 text-sm">{quantity}</span>
                         <button
-                          onClick={(e) => handleIncrement(deal.id, e)}
+                          onClick={(e) => handleIncrement(String(deal.id), e)}
                           className="p-1 hover:bg-green-100 rounded transition-colors"
                         >
                           <Plus className="w-4 h-4 text-green-600" />
@@ -443,7 +443,7 @@ export default function Home() {
               { id: 2005, name: 'Blueberries', price: '$4.99', rating: 4.8, unit: '18 oz', image: 'https://images.unsplash.com/photo-1498557850523-fd3d118b962e?w=300&q=80' },
               { id: 2006, name: 'Chicken Breast', price: '$8.99', rating: 4.7, unit: 'lb', image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?w=300&q=80' },
             ].map((product) => {
-              const quantity = getItemQuantity(product.id);
+              const quantity = getItemQuantity(String(product.id));
               return (
                 <Link
                   key={product.id}
@@ -480,7 +480,7 @@ export default function Home() {
                     ) : (
                       <div className="flex items-center justify-between bg-green-50 border-2 border-green-600 rounded-lg p-1">
                         <button
-                          onClick={(e) => handleDecrement(product.id, e)}
+                          onClick={(e) => handleDecrement(String(product.id), e)}
                           className="p-1 hover:bg-green-100 rounded transition-colors"
                         >
                           {quantity === 1 ? (
@@ -491,7 +491,7 @@ export default function Home() {
                         </button>
                         <span className="font-bold text-green-600 text-sm">{quantity}</span>
                         <button
-                          onClick={(e) => handleIncrement(product.id, e)}
+                          onClick={(e) => handleIncrement(String(product.id), e)}
                           className="p-1 hover:bg-green-100 rounded transition-colors"
                         >
                           <Plus className="w-4 h-4 text-green-600" />
