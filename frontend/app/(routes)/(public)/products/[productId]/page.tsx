@@ -175,8 +175,8 @@ export default function ProductDetailPage() {
   const [showQuantityDropdown, setShowQuantityDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   
-  const productIdNum = parseInt(product.id);
-  const itemInCart = cartItems[productIdNum];
+  const productIdStr = product.id;
+  const itemInCart = cartItems[productIdStr];
   const cartQuantity = itemInCart?.quantity || 0;
 
   const handleQuantityChange = (value: number) => {
@@ -198,9 +198,9 @@ export default function ProductDetailPage() {
   
   const handleCartQuantityChange = (newQty: number) => {
     if (newQty === 0) {
-      removeFromCart(productIdNum);
+      removeFromCart(productIdStr);
     } else {
-      updateQuantity(productIdNum, newQty);
+      updateQuantity(productIdStr, newQty);
     }
     setShowQuantityDropdown(false);
   };
@@ -208,7 +208,7 @@ export default function ProductDetailPage() {
   const handleAddToCart = () => {
     for (let i = 0; i < quantity; i++) {
       addToCart({
-        id: parseInt(product.id),
+        id: product.id,
         name: product.name,
         price: product.price,
         originalPrice: product.originalPrice,
