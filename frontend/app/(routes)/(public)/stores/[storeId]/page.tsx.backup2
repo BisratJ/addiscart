@@ -1,0 +1,538 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Search, Star, Clock, MapPin, Phone, ChevronRight, ShoppingCart, Plus, Minus } from 'lucide-react';
+
+// Mock product data
+const mockCategories = [
+  { id: 'cat1', name: 'Produce', count: 24 },
+  { id: 'cat2', name: 'Dairy', count: 18 },
+  { id: 'cat3', name: 'Bakery', count: 12 },
+  { id: 'cat4', name: 'Meat', count: 15 },
+  { id: 'cat5', name: 'Pantry', count: 30 },
+];
+
+const mockProducts = [
+  {
+    id: 'prod1',
+    name: 'Organic Bananas',
+    description: 'Sweet and nutritious organic bananas, perfect for snacking or baking.',
+    price: 0.79,
+    salePrice: 0.69,
+    onSale: true,
+    image: 'https://images.unsplash.com/photo-1543218024-57a70143c369?auto=format&fit=crop&w=300&q=80',
+    category: 'Produce',
+    unit: 'each',
+    stock: 100,
+  },
+  {
+    id: 'prod2',
+    name: 'Avocado',
+    description: 'Ripe and ready to eat avocados, perfect for guacamole or toast.',
+    price: 1.99,
+    image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?auto=format&fit=crop&w=300&q=80',
+    category: 'Produce',
+    unit: 'each',
+    stock: 50,
+  },
+  {
+    id: 'prod3',
+    name: 'Organic Whole Milk',
+    description: 'Fresh organic whole milk from grass-fed cows.',
+    price: 4.99,
+    image: 'https://images.unsplash.com/photo-1550583724-b2692b85b150?auto=format&fit=crop&w=300&q=80',
+    category: 'Dairy',
+    unit: 'gallon',
+    stock: 30,
+  },
+  {
+    id: 'prod4',
+    name: 'Large Eggs',
+    description: 'Farm fresh large eggs, perfect for breakfast or baking.',
+    price: 3.99,
+    salePrice: 2.99,
+    onSale: true,
+    image: 'https://images.unsplash.com/photo-1506976785307-8732e854ad03?auto=format&fit=crop&w=300&q=80',
+    category: 'Dairy',
+    unit: 'dozen',
+    stock: 40,
+  },
+  {
+    id: 'prod5',
+    name: 'Sourdough Bread',
+    description: 'Freshly baked sourdough bread with a crispy crust and soft interior.',
+    price: 4.49,
+    image: 'https://images.unsplash.com/photo-1585478259715-4ddc6bc4f9ed?auto=format&fit=crop&w=300&q=80',
+    category: 'Bakery',
+    unit: 'loaf',
+    stock: 20,
+  },
+  {
+    id: 'prod6',
+    name: 'Organic Chicken Breast',
+    description: 'Boneless, skinless organic chicken breast from free-range chickens.',
+    price: 9.99,
+    image: 'https://images.unsplash.com/photo-1604503468506-a8da13d82791?auto=format&fit=crop&w=300&q=80',
+    category: 'Meat',
+    unit: 'lb',
+    stock: 15,
+  },
+];
+
+// Mock store data
+const mockStores = [
+  {
+    id: 'store1',
+    name: 'Fresh Grocery',
+    description: 'Your local grocery store with fresh produce and essentials.',
+    logo: 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=1000&q=80',
+    rating: 4.7,
+    deliveryFee: 3.99,
+    minimumOrder: 10.00,
+    address: '100 Market St, San Francisco, CA 94105',
+    phone: '415-555-1234',
+    hours: {
+      monday: { open: '08:00', close: '22:00' },
+      tuesday: { open: '08:00', close: '22:00' },
+      wednesday: { open: '08:00', close: '22:00' },
+      thursday: { open: '08:00', close: '22:00' },
+      friday: { open: '08:00', close: '22:00' },
+      saturday: { open: '08:00', close: '22:00' },
+      sunday: { open: '08:00', close: '20:00' },
+    },
+  },
+  {
+    id: 'store2',
+    name: 'Organic Market',
+    description: 'Specializing in organic and locally sourced products.',
+    logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?auto=format&fit=crop&w=1000&q=80',
+    rating: 4.5,
+    deliveryFee: 4.99,
+    minimumOrder: 15.00,
+    address: '200 Organic Ave, Berkeley, CA 94704',
+    phone: '510-555-5678',
+    hours: {
+      monday: { open: '09:00', close: '21:00' },
+      tuesday: { open: '09:00', close: '21:00' },
+      wednesday: { open: '09:00', close: '21:00' },
+      thursday: { open: '09:00', close: '21:00' },
+      friday: { open: '09:00', close: '21:00' },
+      saturday: { open: '09:00', close: '21:00' },
+      sunday: { open: '10:00', close: '18:00' },
+    },
+  },
+];
+
+export default function StorePage() {
+  const params = useParams();
+  const router = useRouter();
+  const { storeId } = params;
+  
+  const [store, setStore] = useState<any>(null);
+  const [products, setProducts] = useState(mockProducts);
+  const [categories, setCategories] = useState(mockCategories);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [cart, setCart] = useState<{[key: string]: number}>({});
+  const [cartTotal, setCartTotal] = useState(0);
+
+  // Fetch store data
+  useEffect(() => {
+    const fetchStore = async () => {
+      setIsLoading(true);
+      try {
+        // Simulate API call
+        setTimeout(() => {
+          const foundStore = mockStores.find(s => s.id === storeId);
+          if (foundStore) {
+            setStore(foundStore);
+          } else {
+            // If store not found, redirect to stores page
+            router.push('/stores');
+          }
+          setIsLoading(false);
+        }, 500);
+      } catch (error) {
+        console.error('Error fetching store:', error);
+        setIsLoading(false);
+      }
+    };
+
+    if (storeId) {
+      fetchStore();
+    }
+  }, [storeId, router]);
+
+  // Filter products by category
+  useEffect(() => {
+    if (selectedCategory) {
+      const filtered = mockProducts.filter(
+        product => product.category === selectedCategory
+      );
+      setProducts(filtered);
+    } else {
+      setProducts(mockProducts);
+    }
+  }, [selectedCategory]);
+
+  // Handle search
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      const filtered = mockProducts.filter(
+        product =>
+          product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          product.description.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setProducts(filtered);
+      setSelectedCategory(null);
+    } else {
+      setProducts(mockProducts);
+    }
+  };
+
+  // Add to cart
+  const addToCart = (productId: string) => {
+    setCart(prev => {
+      const newCart = { ...prev };
+      newCart[productId] = (newCart[productId] || 0) + 1;
+      return newCart;
+    });
+    updateCartTotal();
+  };
+
+  // Remove from cart
+  const removeFromCart = (productId: string) => {
+    setCart(prev => {
+      const newCart = { ...prev };
+      if (newCart[productId] > 1) {
+        newCart[productId] -= 1;
+      } else {
+        delete newCart[productId];
+      }
+      return newCart;
+    });
+    updateCartTotal();
+  };
+
+  // Update cart total
+  const updateCartTotal = () => {
+    let total = 0;
+    Object.entries(cart).forEach(([productId, quantity]) => {
+      const product = mockProducts.find(p => p.id === productId);
+      if (product) {
+        const price = product.onSale ? (product.salePrice || product.price) : product.price;
+        total += price * quantity;
+      }
+    });
+    setCartTotal(total);
+  };
+
+  // Calculate cart total whenever cart changes
+  useEffect(() => {
+    updateCartTotal();
+  }, [cart]);
+
+  // Proceed to checkout
+  const proceedToCheckout = () => {
+    if (Object.keys(cart).length === 0) {
+      alert('Your cart is empty');
+      return;
+    }
+    
+    // Save cart to localStorage for checkout page
+    localStorage.setItem('cart', JSON.stringify(cart));
+    localStorage.setItem('storeId', storeId as string);
+    
+    // Navigate to checkout
+    router.push('/checkout');
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-500"></div>
+      </div>
+    );
+  }
+
+  if (!store) {
+    return (
+      <div className="container mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl font-bold mb-4">Store not found</h1>
+        <p className="mb-4">The store you're looking for doesn't exist.</p>
+        <Link
+          href="/stores"
+          className="bg-brand-500 text-white px-4 py-2 rounded-md hover:bg-brand-600 transition-colors"
+        >
+          Browse Stores
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      {/* Store Header */}
+      <div className="relative h-48 md:h-64 rounded-lg overflow-hidden mb-6">
+        <div className="absolute inset-0">
+          <img
+            src={store.coverImage}
+            alt={store.name}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-40"></div>
+        </div>
+        <div className="absolute bottom-0 left-0 p-4 md:p-6 flex items-end">
+          <div className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-lg overflow-hidden mr-4 flex-shrink-0">
+            <img
+              src={store.logo}
+              alt={store.name}
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-white">
+            <h1 className="text-2xl md:text-3xl font-bold">{store.name}</h1>
+            <div className="flex items-center mt-1">
+              <div className="flex items-center mr-4">
+                <Star className="h-4 w-4 text-yellow-400 mr-1 fill-current" />
+                <span>{store.rating}</span>
+              </div>
+              <div className="flex items-center">
+                <Clock className="h-4 w-4 mr-1" />
+                <span>30-45 min</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Store Info */}
+      <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <p className="text-gray-600 mb-4">{store.description}</p>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="flex items-start">
+            <MapPin className="h-5 w-5 text-gray-400 mr-2 flex-shrink-0 mt-0.5" />
+            <span className="text-gray-600">{store.address}</span>
+          </div>
+          <div className="flex items-center">
+            <Phone className="h-5 w-5 text-gray-400 mr-2 flex-shrink-0" />
+            <span className="text-gray-600">{store.phone}</span>
+          </div>
+          <div className="flex items-center">
+            <Clock className="h-5 w-5 text-gray-400 mr-2 flex-shrink-0" />
+            <span className="text-gray-600">
+              Open today: {store.hours.monday.open} - {store.hours.monday.close}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Categories Sidebar */}
+        <div className="md:w-1/4">
+          <div className="bg-white rounded-lg shadow-md p-4 sticky top-4">
+            <h2 className="font-semibold text-lg mb-4">Categories</h2>
+            <ul className="space-y-2">
+              <li>
+                <button
+                  onClick={() => setSelectedCategory(null)}
+                  className={`w-full text-left px-2 py-1 rounded-md ${
+                    selectedCategory === null
+                      ? 'bg-brand-50 text-brand-600 font-medium'
+                      : 'text-gray-600 hover:bg-gray-100'
+                  }`}
+                >
+                  All Products
+                </button>
+              </li>
+              {categories.map((category) => (
+                <li key={category.id}>
+                  <button
+                    onClick={() => setSelectedCategory(category.name)}
+                    className={`w-full text-left px-2 py-1 rounded-md flex justify-between items-center ${
+                      selectedCategory === category.name
+                        ? 'bg-brand-50 text-brand-600 font-medium'
+                        : 'text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    <span>{category.name}</span>
+                    <span className="text-xs text-gray-400">{category.count}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+
+            {/* Cart Summary */}
+            {Object.keys(cart).length > 0 && (
+              <div className="mt-8 border-t pt-4">
+                <h2 className="font-semibold text-lg mb-2">Your Cart</h2>
+                <div className="space-y-2">
+                  {Object.entries(cart).map(([productId, quantity]) => {
+                    const product = mockProducts.find(p => p.id === productId);
+                    if (!product) return null;
+                    return (
+                      <div key={productId} className="flex justify-between items-center">
+                        <div className="flex items-center">
+                          <span className="text-brand-500 font-medium mr-2">{quantity}×</span>
+                          <span className="truncate">{product.name}</span>
+                        </div>
+                        <span className="font-medium">
+                          ${((product.onSale ? product.salePrice || product.price : product.price) * quantity).toFixed(2)}
+                        </span>
+                      </div>
+                    );
+                  })}
+                  
+                  <div className="border-t pt-2 mt-2">
+                    <div className="flex justify-between items-center font-medium">
+                      <span>Subtotal</span>
+                      <span>${cartTotal.toFixed(2)}</span>
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Delivery fee: ${store.deliveryFee.toFixed(2)}
+                    </div>
+                  </div>
+                  
+                  <button
+                    onClick={proceedToCheckout}
+                    className="w-full bg-brand-500 text-white py-2 rounded-md hover:bg-brand-600 transition-colors mt-4"
+                  >
+                    Checkout
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Products */}
+        <div className="md:w-3/4">
+          {/* Search Bar */}
+          <div className="mb-6">
+            <form onSubmit={handleSearch} className="flex">
+              <div className="relative flex-grow">
+                <input
+                  type="text"
+                  placeholder="Search products..."
+                  className="w-full py-2 pl-10 pr-4 rounded-l-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                <div className="absolute left-0 top-0 mt-2 ml-3 text-gray-400">
+                  <Search size={20} />
+                </div>
+              </div>
+              <button
+                type="submit"
+                className="bg-brand-500 text-white px-6 py-2 rounded-r-md hover:bg-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2"
+              >
+                Search
+              </button>
+            </form>
+          </div>
+
+          {/* Product Grid */}
+          {products.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-md p-8 text-center">
+              <h2 className="text-xl font-semibold text-gray-700 mb-2">No products found</h2>
+              <p className="text-gray-500 mb-4">
+                Try a different search term or category.
+              </p>
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory(null);
+                  setProducts(mockProducts);
+                }}
+                className="bg-brand-500 text-white px-6 py-2 rounded-md hover:bg-brand-600 transition-colors"
+              >
+                Show All Products
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {products.map((product) => (
+                <div
+                  key={product.id}
+                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
+                >
+                  <div className="relative h-40">
+                    <img
+                      src={product.image}
+                      alt={product.name}
+                      className="w-full h-full object-cover"
+                    />
+                    {product.onSale && (
+                      <div className="absolute top-0 left-0 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-br-md">
+                        SALE
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-2">
+                      {product.description}
+                    </p>
+                    <div className="flex justify-between items-center mb-3">
+                      <div>
+                        {product.onSale ? (
+                          <div className="flex items-center">
+                            <span className="font-bold text-lg text-brand-500">
+                              ${product.salePrice?.toFixed(2)}
+                            </span>
+                            <span className="text-gray-400 text-sm line-through ml-2">
+                              ${product.price.toFixed(2)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="font-bold text-lg">
+                            ${product.price.toFixed(2)}
+                          </span>
+                        )}
+                        <div className="text-xs text-gray-500">per {product.unit}</div>
+                      </div>
+                      
+                      {cart[product.id] ? (
+                        <div className="flex items-center">
+                          <button
+                            onClick={() => removeFromCart(product.id)}
+                            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-l-md hover:bg-gray-200"
+                          >
+                            <Minus size={16} />
+                          </button>
+                          <span className="w-8 h-8 flex items-center justify-center bg-gray-100">
+                            {cart[product.id]}
+                          </span>
+                          <button
+                            onClick={() => addToCart(product.id)}
+                            className="w-8 h-8 flex items-center justify-center bg-gray-100 rounded-r-md hover:bg-gray-200"
+                          >
+                            <Plus size={16} />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => addToCart(product.id)}
+                          className="bg-brand-500 text-white p-2 rounded-full hover:bg-brand-600 transition-colors"
+                        >
+                          <ShoppingCart size={18} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

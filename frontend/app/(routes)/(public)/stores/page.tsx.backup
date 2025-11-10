@@ -1,0 +1,550 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { ChevronRight, MapPin, Clock, Star } from 'lucide-react';
+
+interface Store {
+  _id: string;
+  name: string;
+  logo: string;
+  deliveryTime: string;
+  badge?: string;
+  inStorePrice?: boolean;
+}
+
+// Your stores - top section
+const yourStores: Store[] = [
+  { _id: '1', name: 'Safeway', logo: '🛒', deliveryTime: '20 min' },
+  { _id: '2', name: 'Walgreens', logo: '💊', deliveryTime: '25 min', badge: '$5 off' },
+  { _id: '3', name: 'Costco', logo: '🏬', deliveryTime: '30 min' },
+  { _id: '4', name: 'Sprouts Farmers Market', logo: '🥬', deliveryTime: '25 min', badge: 'In-store prices' },
+  { _id: '5', name: 'Target', logo: '🎯', deliveryTime: '25 min' },
+  { _id: '6', name: 'FoodsCo', logo: '🛍️', deliveryTime: '20 min' },
+  { _id: '7', name: 'Walmart', logo: '🛒', deliveryTime: '30 min', badge: 'In-store prices' },
+  { _id: '8', name: 'HMart', logo: '🏪', deliveryTime: '25 min', badge: 'By 2:30pm' },
+  { _id: '9', name: 'Rainbow Grocery', logo: '🌈', deliveryTime: '25 min' },
+  { _id: '10', name: 'Lucky Supermarkets', logo: '🍀', deliveryTime: '30 min', badge: 'In-store prices' },
+];
+
+// Beyond grocery stores
+const beyondGrocery: Store[] = [
+  { _id: '11', name: "Kohl's", logo: '👔', deliveryTime: '30 min', badge: '$15 off' },
+  { _id: '12', name: 'Total Wine & More', logo: '🍷', deliveryTime: '25 min' },
+  { _id: '13', name: "Lowe's", logo: '🔨', deliveryTime: '30 min', badge: '$15 off' },
+  { _id: '14', name: 'BevMo!', logo: '🍺', deliveryTime: '20 min' },
+  { _id: '15', name: 'Staples', logo: '📎', deliveryTime: '25 min', badge: 'In-store prices' },
+  { _id: '16', name: 'Michaels', logo: '🎨', deliveryTime: '30 min', badge: 'In-store prices' },
+  { _id: '17', name: 'The Home Depot', logo: '🏠', deliveryTime: '30 min' },
+  { _id: '18', name: 'Dollar Tree', logo: '💵', deliveryTime: '25 min', badge: 'In-store prices' },
+  { _id: '19', name: 'PetSmart', logo: '🐾', deliveryTime: '30 min', badge: 'In-store prices' },
+  { _id: '20', name: "DICK'S Sporting Goods", logo: '⚽', deliveryTime: '30 min', badge: 'In-store prices' },
+  { _id: '21', name: 'Petco', logo: '🐕', deliveryTime: '30 min', badge: 'In-store prices' },
+];
+
+// Detailed stores for "Stores to help you save" section
+const detailedStores: Store[] = [
+  {
+    _id: 'store1',
+    name: 'Fresh Grocery',
+    description: 'Your local grocery store with fresh produce and essentials.',
+    logo: 'https://images.unsplash.com/photo-1534723452862-4c874018d66d?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.7,
+    deliveryFee: 3.99,
+    minimumOrder: 10.00,
+    categories: ['Produce', 'Dairy', 'Bakery', 'Meat', 'Pantry']
+  },
+  {
+    _id: 'store2',
+    name: 'Organic Market',
+    description: 'Specializing in organic and locally sourced products.',
+    logo: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1550989460-0adf9ea622e2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.5,
+    deliveryFee: 4.99,
+    minimumOrder: 15.00,
+    categories: ['Organic', 'Local', 'Vegan', 'Gluten-Free']
+  },
+  {
+    _id: 'store3',
+    name: 'Quick Mart',
+    description: 'Fast delivery of everyday essentials and groceries.',
+    logo: 'https://images.unsplash.com/photo-1567103472667-6898f3a79cf2?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.2,
+    deliveryFee: 2.99,
+    minimumOrder: 5.00,
+    categories: ['Snacks', 'Beverages', 'Household', 'Personal Care']
+  },
+  {
+    _id: 'store4',
+    name: 'Gourmet Deli',
+    description: 'Premium deli selections, cheeses, and prepared foods.',
+    logo: 'https://images.unsplash.com/photo-1625604087024-7fb3c6c3d7b7?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1547496502-affa22e38842?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.8,
+    deliveryFee: 5.99,
+    minimumOrder: 20.00,
+    categories: ['Deli', 'Cheese', 'Prepared Foods', 'Specialty']
+  },
+  {
+    _id: 'store5',
+    name: 'Whole Foods Market',
+    description: 'Premium organic and natural foods with a wide selection.',
+    logo: 'https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.6,
+    deliveryFee: 4.99,
+    minimumOrder: 15.00,
+    categories: ['Organic', 'Natural', 'Specialty', 'Health']
+  },
+  {
+    _id: 'store6',
+    name: 'Trader Joes',
+    description: 'Unique and affordable groceries with friendly service.',
+    logo: 'https://images.unsplash.com/photo-1601599561213-832382fd07ba?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.7,
+    deliveryFee: 3.49,
+    minimumOrder: 12.00,
+    categories: ['Specialty', 'Snacks', 'Frozen', 'Organic']
+  },
+  {
+    _id: 'store7',
+    name: 'Safeway',
+    description: 'Your neighborhood supermarket with great deals and variety.',
+    logo: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1578916171728-46686eac8d58?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.3,
+    deliveryFee: 3.99,
+    minimumOrder: 10.00,
+    categories: ['Groceries', 'Pharmacy', 'Bakery', 'Deli']
+  },
+  {
+    _id: 'store8',
+    name: 'Costco Wholesale',
+    description: 'Bulk groceries and household items at wholesale prices.',
+    logo: 'https://images.unsplash.com/photo-1583258292688-d0213dc5a3a8?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80',
+    coverImage: 'https://images.unsplash.com/photo-1604719312566-8912e9227c6a?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
+    rating: 4.5,
+    deliveryFee: 0.00,
+    minimumOrder: 35.00,
+    categories: ['Bulk', 'Wholesale', 'Electronics', 'Groceries']
+  },
+];
+
+export default function StoresPage() {
+  const [stores, setStores] = useState<Store[]>(mockStores);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [showFilters, setShowFilters] = useState(false);
+
+  // Extract unique categories from stores
+  const categories = ['All', ...Array.from(new Set(mockStores.flatMap(store => store.categories)))];
+
+  // Memoized fetch function to avoid recreating it on every render
+  const fetchStores = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      
+      // Check for cached data first
+      const cacheKey = `stores_${currentPage}_${searchQuery}`;
+      const cachedData = sessionStorage.getItem(cacheKey);
+      
+      if (cachedData) {
+        try {
+          const parsedData = JSON.parse(cachedData);
+          setStores(parsedData.stores);
+          setTotalPages(parsedData.totalPages);
+          setIsLoading(false);
+          return;
+        } catch (e) {
+          console.error('Error parsing cached stores data:', e);
+          // Continue with fetch if cache parsing fails
+        }
+      }
+      
+      // Use AbortController for timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+      
+      try {
+        const response = await fetch(
+          `http://localhost:5001/api/stores?page=${currentPage}&limit=6${searchQuery ? `&search=${searchQuery}` : ''}`,
+          { signal: controller.signal }
+        );
+        
+        clearTimeout(timeoutId);
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch stores');
+        }
+        
+        const data = await response.json();
+        const storeData = data.stores || [];
+        const totalPages = data.pagination?.pages || 1;
+        
+        // Cache the results
+        sessionStorage.setItem(cacheKey, JSON.stringify({
+          stores: storeData,
+          totalPages,
+          timestamp: Date.now()
+        }));
+        
+        setStores(storeData);
+        setTotalPages(totalPages);
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        throw fetchError; // Re-throw to be caught by outer try/catch
+      }
+    } catch (err) {
+      console.error('Error fetching stores:', err);
+      setError('Failed to load stores. Using mock data.');
+      // Use mock data as fallback
+      setStores(mockStores);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, searchQuery]);
+
+  // Fetch stores when dependencies change
+  useEffect(() => {
+    fetchStores();
+  }, [fetchStores]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setCurrentPage(1); // Reset to first page on new search
+  };
+
+  // Filter stores by category and search query
+  const filteredStores = stores.filter(store => {
+    // Filter by category
+    const matchesCategory = selectedCategory === 'All' || store.categories.includes(selectedCategory);
+    
+    // Filter by search query
+    const matchesSearch = !searchQuery || 
+      store.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      store.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      store.categories.some(cat => cat.toLowerCase().includes(searchQuery.toLowerCase()));
+    
+    return matchesCategory && matchesSearch;
+  });
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Header */}
+      <div className="bg-gradient-to-r from-brand-500 to-brand-600 text-white py-12">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">Discover Local Stores</h1>
+            <p className="text-lg text-white/90 mb-6">Browse from {stores.length} stores and get fresh groceries delivered to your door</p>
+            
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="relative">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
+                <input
+                  type="text"
+                  placeholder="Search stores, products, or categories..."
+                  className="w-full py-4 pl-12 pr-12 rounded-xl border-0 text-gray-900 shadow-lg focus:outline-none focus:ring-2 focus:ring-white"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    <X size={20} />
+                  </button>
+                )}
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div className="container mx-auto px-4 py-8">
+        {/* Stats Bar */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-white rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-brand-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900">{stores.length}</div>
+                <div className="text-sm text-gray-500">Stores</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <Star className="w-5 h-5 text-yellow-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900">4.6</div>
+                <div className="text-sm text-gray-500">Avg Rating</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-green-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900">30m</div>
+                <div className="text-sm text-gray-500">Avg Delivery</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-white rounded-xl p-4 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-5 h-5 text-blue-600" />
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-gray-900">$3.99</div>
+                <div className="text-sm text-gray-500">Avg Fee</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Category Filter */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Categories</h2>
+            <button
+              onClick={() => setShowFilters(!showFilters)}
+              className="md:hidden flex items-center gap-2 text-brand-600 font-medium"
+            >
+              <Filter size={20} />
+              Filters
+            </button>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setSelectedCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  selectedCategory === category
+                    ? 'bg-brand-500 text-white shadow-md'
+                    : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm'
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Error Message */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <p className="text-red-700 text-sm">{error}</p>
+          </div>
+        )}
+
+        {/* Results Count */}
+        <div className="mb-6 flex items-center justify-between">
+          <p className="text-gray-600">
+            Showing <span className="font-semibold text-gray-900">{filteredStores.length}</span> of <span className="font-semibold text-gray-900">{stores.length}</span> stores
+            {searchQuery && (
+              <span> for "<span className="font-semibold text-brand-600">{searchQuery}</span>"</span>
+            )}
+            {selectedCategory !== 'All' && (
+              <span> in <span className="font-semibold text-brand-600">{selectedCategory}</span></span>
+            )}
+          </p>
+          {(searchQuery || selectedCategory !== 'All') && (
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setSelectedCategory('All');
+              }}
+              className="text-sm text-brand-600 hover:text-brand-700 font-medium flex items-center gap-1"
+            >
+              <X size={16} />
+              Clear all filters
+            </button>
+          )}
+        </div>
+
+        {/* Loading State with Skeleton Cards */}
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, index) => (
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        ) : filteredStores.length === 0 ? (
+          // Empty State
+          <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
+            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="w-8 h-8 text-gray-400" />
+            </div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">No stores found</h2>
+            <p className="text-gray-500 mb-4">
+              {searchQuery
+                ? `No results found for "${searchQuery}"`
+                : selectedCategory !== 'All'
+                ? `No stores found in ${selectedCategory} category`
+                : 'There are no stores available at the moment.'}
+            </p>
+            {(searchQuery || selectedCategory !== 'All') && (
+              <button
+                onClick={() => {
+                  setSearchQuery('');
+                  setSelectedCategory('All');
+                }}
+                className="text-brand-600 font-medium hover:text-brand-700"
+              >
+                Clear filters
+              </button>
+            )}
+          </div>
+        ) : (
+          <>
+            {/* Store Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredStores.map((store) => (
+                <Link
+                  key={store._id}
+                  href={`/stores/${store._id}`}
+                  className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden"
+                >
+                  {/* Store Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <Image
+                      src={store.coverImage || store.logo || '/images/store-placeholder.jpg'}
+                      alt={store.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-300"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = '/images/store-placeholder.jpg';
+                      }}
+                    />
+                    {/* Overlay Badge */}
+                    <div className="absolute top-4 right-4">
+                      <div className="bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                        <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                        <span className="text-sm font-semibold text-gray-900">{store.rating.toFixed(1)}</span>
+                      </div>
+                    </div>
+                    {/* Free Delivery Badge */}
+                    {store.deliveryFee === 0 && (
+                      <div className="absolute top-4 left-4">
+                        <div className="bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-lg">
+                          FREE DELIVERY
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Store Info */}
+                  <div className="p-5">
+                    <h3 className="font-bold text-lg text-gray-900 mb-2 group-hover:text-brand-600 transition-colors">
+                      {store.name}
+                    </h3>
+                    <p className="text-gray-600 text-sm line-clamp-2 mb-4">{store.description}</p>
+                    
+                    {/* Categories */}
+                    <div className="flex flex-wrap gap-1 mb-4">
+                      {store.categories.slice(0, 3).map((category, idx) => (
+                        <span
+                          key={idx}
+                          className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md"
+                        >
+                          {category}
+                        </span>
+                      ))}
+                    </div>
+                    
+                    {/* Store Details */}
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                      <div className="flex items-center gap-1 text-sm text-gray-600">
+                        <Clock className="w-4 h-4" />
+                        <span>30-45 min</span>
+                      </div>
+                      <div className="flex items-center gap-1 text-sm font-semibold text-gray-900">
+                        {store.deliveryFee === 0 ? (
+                          <span className="text-green-600">Free</span>
+                        ) : (
+                          <>
+                            <DollarSign className="w-4 h-4" />
+                            <span>{store.deliveryFee.toFixed(2)}</span>
+                          </>
+                        )}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        Min ${store.minimumOrder.toFixed(0)}
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+            
+            {/* Pagination */}
+            {totalPages > 1 && (
+              <div className="flex justify-center mt-12">
+                <nav className="flex items-center gap-2">
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      currentPage === 1
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-brand-50 hover:text-brand-600 shadow-sm'
+                    }`}
+                  >
+                    Previous
+                  </button>
+                  
+                  {[...Array(totalPages)].map((_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`w-10 h-10 rounded-lg font-medium transition-all ${
+                        currentPage === i + 1
+                          ? 'bg-brand-500 text-white shadow-md'
+                          : 'bg-white text-gray-700 hover:bg-brand-50 hover:text-brand-600 shadow-sm'
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                  
+                  <button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                      currentPage === totalPages
+                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-700 hover:bg-brand-50 hover:text-brand-600 shadow-sm'
+                    }`}
+                  >
+                    Next
+                  </button>
+                </nav>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
