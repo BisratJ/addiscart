@@ -310,9 +310,9 @@ export default function StoreDetailPage() {
                       <button
                         onClick={(e) => {
                           if (cartItems[product.id].quantity > 1) {
-                            handleDecrement(product.id, e);
+                            handleDecrement(String(product.id), e);
                           } else {
-                            handleRemove(product.id, e);
+                            handleRemove(String(product.id), e);
                           }
                         }}
                         className="hover:bg-green-800 rounded-full p-1 transition-colors"
@@ -413,9 +413,9 @@ export default function StoreDetailPage() {
                       <button
                         onClick={(e) => {
                           if (cartItems[product.id].quantity > 1) {
-                            handleDecrement(product.id, e);
+                            handleDecrement(String(product.id), e);
                           } else {
-                            handleRemove(product.id, e);
+                            handleRemove(String(product.id), e);
                           }
                         }}
                         className="hover:bg-green-800 rounded-full p-1 transition-colors"
