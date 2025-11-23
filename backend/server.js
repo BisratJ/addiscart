@@ -19,10 +19,16 @@ const paymentRoutes = require('./routes/payments');
 const app = express();
 
 // Middleware
-app.use(cors());
+// CORS configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+  credentials: true,
+  optionsSuccessStatus: 200
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(morgan('dev'));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 
 // Static files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
