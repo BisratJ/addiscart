@@ -7,7 +7,7 @@ import { useCart } from '@/app/contexts/CartContext';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '@/app/components/checkout/CheckoutForm';
-import ChapaPayment from '@/app/components/ChapaPayment';
+// import ChapaPayment from '@/app/components/ChapaPayment';
 import { MapPin, Clock, CreditCard, ShoppingBag, ChevronLeft, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -218,7 +218,8 @@ export default function CheckoutPage() {
                   </div>
                 </label>
                 
-                <label className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
+                {/* Temporarily disabled - fixing integration issues */}
+                {/* <label className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -234,7 +235,7 @@ export default function CheckoutPage() {
                   <div className="flex gap-1">
                     <div className="w-8 h-6 bg-green-600 rounded flex items-center justify-center text-white text-xs font-bold">ETB</div>
                   </div>
-                </label>
+                </label> */}
                 
                 <label className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
                   <input
@@ -265,8 +266,8 @@ export default function CheckoutPage() {
                 </Elements>
               )}
 
-              {/* Chapa Payment Form */}
-              {paymentMethod === 'chapa' && (
+              {/* Chapa Payment Form - Temporarily disabled */}
+              {/* {paymentMethod === 'chapa' && (
                 <div className="mt-6">
                   <ChapaPayment
                     amount={total * 55}
@@ -282,7 +283,7 @@ export default function CheckoutPage() {
                     }}
                   />
                 </div>
-              )}
+              )} */}
 
               {/* Cash Payment Button */}
               {paymentMethod === 'cash' && (

@@ -18,7 +18,8 @@ const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payments');
-const chapaPaymentRoutes = require('./routes/chapaPayments');
+// Temporarily disabled - fixing issues
+// const chapaPaymentRoutes = require('./routes/chapaPayments');
 
 // Initialize express app
 const app = express();
@@ -89,7 +90,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/chapa', chapaPaymentRoutes);
+// app.use('/api/chapa', chapaPaymentRoutes);
 
 // Root route
 app.get('/', (req, res) => {
