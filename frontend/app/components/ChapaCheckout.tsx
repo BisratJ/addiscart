@@ -2,7 +2,8 @@
 
 import { useState } from 'react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+// Ensure API_URL has no trailing slash
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api').replace(/\/+$/, '');
 
 interface ChapaCheckoutProps {
   amount: number;
