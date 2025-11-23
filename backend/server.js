@@ -18,6 +18,7 @@ const productRoutes = require('./routes/products');
 const cartRoutes = require('./routes/cart');
 const orderRoutes = require('./routes/orders');
 const paymentRoutes = require('./routes/payments');
+const chapaRoutes = require('./routes/chapa');
 
 // Initialize express app
 const app = express();
@@ -88,6 +89,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/chapa', chapaRoutes);
 
 // Root route
 app.get('/', (req, res) => {

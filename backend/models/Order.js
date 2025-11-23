@@ -124,6 +124,19 @@ const orderSchema = new mongoose.Schema(
         note: String,
       },
     ],
+    // Chapa payment gateway data
+    chapaData: {
+      tx_ref: {
+        type: String,
+        unique: true,
+        sparse: true
+      },
+      currency: {
+        type: String,
+        enum: ['ETB', 'USD', 'KES', 'UGX', 'TZS'],
+        default: 'ETB'
+      }
+    }
   },
   {
     timestamps: true,
