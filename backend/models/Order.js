@@ -84,7 +84,7 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: {
         type: String,
-        enum: ['card', 'paypal'],
+        enum: ['card', 'paypal', 'chapa'],
         required: true,
       },
       details: {
@@ -94,6 +94,23 @@ const orderSchema = new mongoose.Schema(
     },
     paymentId: {
       type: String,
+    },
+    // Chapa-specific fields
+    txRef: {
+      type: String,
+      unique: true,
+      sparse: true, // Allow null values
+    },
+    chapaPaymentId: {
+      type: String,
+    },
+    currency: {
+      type: String,
+      default: 'USD',
+      enum: ['USD', 'ETB', 'KES', 'UGX', 'TZS'], // Support multiple currencies
+    },
+    paidAt: {
+      type: Date,
     },
     deliveryAddress: {
       street: { type: String, required: true },
