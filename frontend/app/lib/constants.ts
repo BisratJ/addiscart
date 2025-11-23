@@ -3,9 +3,22 @@
  * Centralized configuration for easy maintenance
  */
 
+// Helper to get API URL based on environment
+const getBaseUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  // Only use localhost in development
+  if (process.env.NODE_ENV === 'production') {
+    console.error('NEXT_PUBLIC_API_URL not configured in production');
+    return '/api';
+  }
+  return 'http://localhost:5001';
+};
+
 // API Configuration
 export const API_CONFIG = {
-  BASE_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001',
+  BASE_URL: getBaseUrl(),
   TIMEOUT: 10000,
   RETRY_ATTEMPTS: 2,
   CACHE_DURATION: 5 * 60 * 1000, // 5 minutes

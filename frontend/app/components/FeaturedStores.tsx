@@ -67,7 +67,15 @@ export default function FeaturedStores() {
   useEffect(() => {
     const fetchStores = async () => {
       try {
-        const response = await fetch('http://localhost:5001/api/stores?limit=4');
+        // Only fetch in development or if API URL is configured
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl && process.env.NODE_ENV === 'production') {
+          console.warn('API URL not configured in production');
+          return;
+        }
+        
+        const baseUrl = apiUrl || 'http://localhost:5001';
+        const response = await fetch(`${baseUrl}/api/stores?limit=4`);
         
         if (!response.ok) {
           throw new Error('Failed to fetch stores');

@@ -148,12 +148,19 @@ export default function OrderDetailPage() {
       }
       
       try {
+        // Only fetch if API URL is configured (prevent localhost calls in production)
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+        if (!apiUrl && process.env.NODE_ENV === 'production') {
+          throw new Error('API URL not configured');
+        }
+        
         // Try to fetch from API with AbortController for timeout
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
         
+        const baseUrl = apiUrl || 'http://localhost:5001';
         try {
-          const response = await fetch(`http://localhost:5001/api/orders/${orderId}`, {
+          const response = await fetch(`${baseUrl}/api/orders/${orderId}`, {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`,
             },

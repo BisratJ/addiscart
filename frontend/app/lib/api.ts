@@ -1,6 +1,20 @@
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api';
+// Only use localhost as fallback in development
+const getApiUrl = () => {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  // In production, don't fallback to localhost
+  if (process.env.NODE_ENV === 'production') {
+    console.error('NEXT_PUBLIC_API_URL is not configured in production!');
+    return '/api'; // Use relative path as last resort
+  }
+  // Development fallback
+  return 'http://localhost:5001/api';
+};
+
+const API_URL = getApiUrl();
 
 // Simple in-memory cache
 const cache = new Map<string, { data: any; timestamp: number }>();

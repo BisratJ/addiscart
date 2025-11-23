@@ -34,9 +34,22 @@ interface EnvConfig {
 function getEnvConfig(): EnvConfig {
   const nodeEnv = (process.env.NODE_ENV || 'development') as 'development' | 'production' | 'test';
   
+  // Get API URL based on environment
+  const getApiUrl = () => {
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      return process.env.NEXT_PUBLIC_API_URL;
+    }
+    // Only use localhost in development
+    if (nodeEnv === 'production') {
+      console.error('NEXT_PUBLIC_API_URL not configured in production');
+      return '/api';
+    }
+    return 'http://localhost:5001';
+  };
+  
   return {
     // API
-    API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001',
+    API_URL: getApiUrl(),
     
     // Auth
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
