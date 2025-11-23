@@ -7,6 +7,7 @@ import { useCart } from '@/app/contexts/CartContext';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '@/app/components/checkout/CheckoutForm';
+import ChapaPayment from '@/app/components/ChapaPayment';
 import { MapPin, Clock, CreditCard, ShoppingBag, ChevronLeft, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -21,7 +22,7 @@ export default function CheckoutPage() {
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [deliveryInstructions, setDeliveryInstructions] = useState('');
   const [deliveryTime, setDeliveryTime] = useState('asap');
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash'>('card');
+  const [paymentMethod, setPaymentMethod] = useState<'card' | 'cash' | 'chapa'>('card');
   const [clientSecret, setClientSecret] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -221,6 +222,24 @@ export default function CheckoutPage() {
                   <input
                     type="radio"
                     name="paymentMethod"
+                    value="chapa"
+                    checked={paymentMethod === 'chapa'}
+                    onChange={(e) => setPaymentMethod(e.target.value as 'chapa')}
+                    className="w-5 h-5 text-green-600"
+                  />
+                  <div className="flex-1">
+                    <div className="font-semibold text-gray-900">Pay with Chapa</div>
+                    <div className="text-sm text-gray-600">Cards, Mobile Money, Bank Transfer</div>
+                  </div>
+                  <div className="flex gap-1">
+                    <div className="w-8 h-6 bg-green-600 rounded flex items-center justify-center text-white text-xs font-bold">ETB</div>
+                  </div>
+                </label>
+                
+                <label className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
+                  <input
+                    type="radio"
+                    name="paymentMethod"
                     value="cash"
                     checked={paymentMethod === 'cash'}
                     onChange={(e) => setPaymentMethod(e.target.value as 'cash')}
@@ -244,6 +263,25 @@ export default function CheckoutPage() {
                     }}
                   />
                 </Elements>
+              )}
+
+              {/* Chapa Payment Form */}
+              {paymentMethod === 'chapa' && (
+                <div className="mt-6">
+                  <ChapaPayment
+                    amount={total}
+                    cartId={items[0]?.id || 'cart-id'}
+                    userEmail={user?.email || ''}
+                    userPhone={user?.phone || ''}
+                    onSuccess={(orderId) => {
+                      clearCart();
+                      router.push(`/orders/${orderId}/success`);
+                    }}
+                    onError={(error) => {
+                      console.error('Chapa payment error:', error);
+                    }}
+                  />
+                </div>
               )}
 
               {/* Cash Payment Button */}
