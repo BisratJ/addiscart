@@ -44,7 +44,7 @@ const orderSchema = new mongoose.Schema(
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Store',
-      required: false,
+      required: true,
     },
     items: [orderItemSchema],
     subtotal: {
@@ -84,7 +84,7 @@ const orderSchema = new mongoose.Schema(
     paymentMethod: {
       type: {
         type: String,
-        enum: ['card', 'paypal', 'chapa'],
+        enum: ['card', 'paypal'],
         required: true,
       },
       details: {
@@ -94,23 +94,6 @@ const orderSchema = new mongoose.Schema(
     },
     paymentId: {
       type: String,
-    },
-    // Chapa-specific fields
-    txRef: {
-      type: String,
-      unique: true,
-      sparse: true, // Allow null values
-    },
-    chapaPaymentId: {
-      type: String,
-    },
-    currency: {
-      type: String,
-      default: 'USD',
-      enum: ['USD', 'ETB', 'KES', 'UGX', 'TZS'], // Support multiple currencies
-    },
-    paidAt: {
-      type: Date,
     },
     deliveryAddress: {
       street: { type: String, required: true },

@@ -7,7 +7,6 @@ import { useCart } from '@/app/contexts/CartContext';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
 import CheckoutForm from '@/app/components/checkout/CheckoutForm';
-// import ChapaPayment from '@/app/components/ChapaPayment';
 import { MapPin, Clock, CreditCard, ShoppingBag, ChevronLeft, Check } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -218,25 +217,6 @@ export default function CheckoutPage() {
                   </div>
                 </label>
                 
-                {/* Temporarily disabled - fixing integration issues */}
-                {/* <label className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
-                  <input
-                    type="radio"
-                    name="paymentMethod"
-                    value="chapa"
-                    checked={paymentMethod === 'chapa'}
-                    onChange={(e) => setPaymentMethod(e.target.value as 'chapa')}
-                    className="w-5 h-5 text-green-600"
-                  />
-                  <div className="flex-1">
-                    <div className="font-semibold text-gray-900">Pay with Chapa</div>
-                    <div className="text-sm text-gray-600">Cards, Mobile Money, Bank Transfer</div>
-                  </div>
-                  <div className="flex gap-1">
-                    <div className="w-8 h-6 bg-green-600 rounded flex items-center justify-center text-white text-xs font-bold">ETB</div>
-                  </div>
-                </label> */}
-                
                 <label className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:border-green-500 transition-colors">
                   <input
                     type="radio"
@@ -265,25 +245,6 @@ export default function CheckoutPage() {
                   />
                 </Elements>
               )}
-
-              {/* Chapa Payment Form - Temporarily disabled */}
-              {/* {paymentMethod === 'chapa' && (
-                <div className="mt-6">
-                  <ChapaPayment
-                    amount={total * 55}
-                    cartId={`temp-cart-${Date.now()}`}
-                    userEmail={user?.email || ''}
-                    userPhone={user?.phone || '+251'}
-                    onSuccess={(orderId) => {
-                      clearCart();
-                      router.push(`/orders/${orderId}/success`);
-                    }}
-                    onError={(error) => {
-                      console.error('Chapa payment error:', error);
-                    }}
-                  />
-                </div>
-              )} */}
 
               {/* Cash Payment Button */}
               {paymentMethod === 'cash' && (
