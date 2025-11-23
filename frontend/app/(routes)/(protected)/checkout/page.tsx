@@ -276,6 +276,11 @@ export default function CheckoutPage() {
                       street: deliveryAddress,
                       instructions: deliveryInstructions
                     }}
+                    user={user ? {
+                      name: user.name,
+                      email: user.email,
+                      phone: user.phone
+                    } : undefined}
                     onSuccess={(orderId) => {
                       clearCart();
                       router.push(`/orders/${orderId}`);

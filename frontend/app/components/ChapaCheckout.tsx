@@ -11,6 +11,11 @@ interface ChapaCheckoutProps {
   onError?: (error: string) => void;
   cartItems?: any[];
   deliveryAddress?: any;
+  user?: {
+    name?: string;
+    email?: string;
+    phone?: string;
+  };
 }
 
 export default function ChapaCheckout({
@@ -19,15 +24,21 @@ export default function ChapaCheckout({
   onSuccess,
   onError,
   cartItems = [],
-  deliveryAddress
+  deliveryAddress,
+  user
 }: ChapaCheckoutProps) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [formData, setFormData] = useState({
-    first_name: '',
-    last_name: '',
-    email: '',
-    phone_number: ''
+  
+  // Pre-fill form with user data if available
+  const [formData, setFormData] = useState(() => {
+    const nameParts = user?.name?.split(' ') || [];
+    return {
+      first_name: nameParts[0] || '',
+      last_name: nameParts.slice(1).join(' ') || '',
+      email: user?.email || '',
+      phone_number: user?.phone || ''
+    };
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,12 +55,9 @@ export default function ChapaCheckout({
     setError('');
 
     try {
-      // Get authorization token
-      const token = localStorage.getItem('token');
-      if (!token) {
-        throw new Error('Please login to continue');
-      }
-
+      // Get authorization token from localStorage or sessionStorage
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      
       // Prepare payment data
       const paymentData = {
         amount,
@@ -63,19 +71,29 @@ export default function ChapaCheckout({
         }
       };
 
+      // Prepare headers
+      const headers: HeadersInit = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
       // Initialize payment with backend
       const response = await fetch(`${API_URL}/chapa/initialize`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
+        headers,
         body: JSON.stringify(paymentData)
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        // If 401 unauthorized, show clearer message
+        if (response.status === 401) {
+          throw new Error('Session expired. Please refresh the page and try again.');
+        }
         throw new Error(data.message || 'Failed to initialize payment');
       }
 
