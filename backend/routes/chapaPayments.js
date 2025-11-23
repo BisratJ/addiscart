@@ -41,23 +41,25 @@ router.post(
       // Generate unique transaction reference
       const txRef = chapaService.generateTxRef();
 
-      // Get cart details
-      const cart = await Cart.findById(cartId).populate('items.product');
-      if (!cart) {
-        return res.status(404).json({ message: 'Cart not found' });
-      }
-
-      // Create order with pending status
+      // Create order with pending status (simplified for now)
       const order = new Order({
         user: req.user.id,
-        items: cart.items.map(item => ({
-          product: item.product._id,
-          quantity: item.quantity,
-          price: item.product.price
-        })),
+        orderNumber: `ORD-${Date.now()}`,
+        store: null, // Will be set later
+        items: [], // Will be populated from cart later
+        subtotal: amount,
+        tax: 0,
+        deliveryFee: 0,
+        serviceFee: 0,
         total: amount,
-        paymentMethod: 'chapa',
+        paymentMethod: { type: 'chapa' },
         paymentStatus: 'pending',
+        deliveryAddress: {
+          street: 'Pending',
+          city: 'Addis Ababa',
+          state: 'AA',
+          zipCode: '1000'
+        },
         status: 'pending',
         txRef,
         currency
@@ -130,8 +132,12 @@ router.get('/verify/:txRef', authenticate, async (req, res) => {
       order.status = 'confirmed';
       order.paidAt = new Date();
 
-      // Clear the cart
-      await Cart.findOneAndDelete({ user: req.user.id });
+      // Try to clear the cart (optional, as cart may be in localStorage)
+      try {
+        await Cart.findOneAndDelete({ user: req.user.id });
+      } catch (e) {
+        // Cart not found in DB, that's okay
+      }
     } else {
       order.paymentStatus = 'failed';
       order.status = 'cancelled';
@@ -176,8 +182,12 @@ router.post('/webhook', express.json(), async (req, res) => {
       order.status = 'confirmed';
       order.paidAt = new Date();
 
-      // Clear user's cart
-      await Cart.findOneAndDelete({ user: order.user });
+      // Try to clear user's cart (optional, as cart may be in localStorage)
+      try {
+        await Cart.findOneAndDelete({ user: order.user });
+      } catch (e) {
+        // Cart not found in DB, that's okay
+      }
     } else if (status === 'failed') {
       order.paymentStatus = 'failed';
       order.status = 'cancelled';

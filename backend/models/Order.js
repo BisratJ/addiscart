@@ -44,7 +44,7 @@ const orderSchema = new mongoose.Schema(
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Store',
-      required: true,
+      required: false,
     },
     items: [orderItemSchema],
     subtotal: {

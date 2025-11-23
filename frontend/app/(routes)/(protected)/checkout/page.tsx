@@ -269,10 +269,10 @@ export default function CheckoutPage() {
               {paymentMethod === 'chapa' && (
                 <div className="mt-6">
                   <ChapaPayment
-                    amount={total}
-                    cartId={items[0]?.id || 'cart-id'}
+                    amount={total * 55}
+                    cartId={`temp-cart-${Date.now()}`}
                     userEmail={user?.email || ''}
-                    userPhone={user?.phone || ''}
+                    userPhone={user?.phone || '+251'}
                     onSuccess={(orderId) => {
                       clearCart();
                       router.push(`/orders/${orderId}/success`);
