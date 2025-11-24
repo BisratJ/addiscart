@@ -178,6 +178,18 @@ router.get('/verify/:tx_ref', authenticate, async (req, res) => {
  */
 router.post('/webhook', express.json(), async (req, res) => {
   try {
+    // Verify webhook secret
+    const webhookSecret = req.headers['chapa-signature'] || req.headers['x-chapa-signature'];
+    const expectedSecret = process.env.CHAPA_WEBHOOK_SECRET;
+
+    if (expectedSecret && webhookSecret !== expectedSecret) {
+      console.error('Webhook signature verification failed');
+      return res.status(401).json({
+        success: false,
+        message: 'Unauthorized: Invalid webhook signature'
+      });
+    }
+
     const { tx_ref, status, amount, currency, email, first_name, last_name } = req.body;
 
     console.log('Chapa webhook received:', {
