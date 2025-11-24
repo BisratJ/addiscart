@@ -82,3 +82,38 @@ exports.isOwnerOrAdmin = (resourceField) => {
     res.status(403).json({ message: 'Access denied. Not authorized to access this resource' });
   };
 };
+
+// Optional authentication - allows guest users but attaches user if token is present
+exports.optionalAuthenticate = async (req, res, next) => {
+  try {
+    // Get token from header
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    if (!token) {
+      // No token provided - continue as guest
+      req.user = null;
+      return next();
+    }
+    
+    // Verify token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Find user by id
+    const user = await User.findById(decoded.id).select('-password');
+    
+    if (!user || !user.isActive) {
+      // Invalid or inactive user - continue as guest
+      req.user = null;
+      return next();
+    }
+    
+    // Add user to request object
+    req.user = user;
+    next();
+  } catch (error) {
+    // Token verification failed - continue as guest
+    console.log('Optional auth: Token invalid, continuing as guest');
+    req.user = null;
+    next();
+  }
+};

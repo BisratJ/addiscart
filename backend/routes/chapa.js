@@ -3,17 +3,17 @@ const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const chapaService = require('../services/chapaService');
 const Order = require('../models/Order');
-const { authenticate } = require('../middleware/auth');
+const { authenticate, optionalAuthenticate } = require('../middleware/auth');
 
 /**
  * @route   POST /api/chapa/initialize
  * @desc    Initialize Chapa payment
- * @access  Private
+ * @access  Public (optionally authenticated)
  * @docs    https://developer.chapa.co/docs/accept-payments
  */
 router.post(
   '/initialize',
-  authenticate,
+  optionalAuthenticate,
   [
     body('amount').isNumeric().withMessage('Amount must be a number'),
     body('currency').optional().isString(),
@@ -43,8 +43,7 @@ router.post(
       const tx_ref = chapaService.generateTxRef();
 
       // Create order in database with pending status
-      const order = new Order({
-        user: req.user.id,
+      const orderData = {
         orderNumber: tx_ref,
         store: req.body.store || null,
         items: req.body.items || [],
@@ -67,8 +66,18 @@ router.post(
         chapaData: {
           tx_ref,
           currency
-        }
-      });
+        },
+        guestEmail: req.user ? null : email, // Store email for guest orders
+        guestName: req.user ? null : `${first_name} ${last_name}`, // Store name for guest orders
+        guestPhone: req.user ? null : phone_number // Store phone for guest orders
+      };
+
+      // Add user reference if authenticated
+      if (req.user) {
+        orderData.user = req.user.id;
+      }
+
+      const order = new Order(orderData);
 
       await order.save();
 

@@ -39,12 +39,25 @@ const orderSchema = new mongoose.Schema(
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
-      required: true,
+      required: false, // Optional for guest checkout
     },
     store: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Store',
-      required: true,
+      required: false, // Optional for guest checkout
+    },
+    // Guest checkout fields (used when user is not authenticated)
+    guestEmail: {
+      type: String,
+      required: false,
+    },
+    guestName: {
+      type: String,
+      required: false,
+    },
+    guestPhone: {
+      type: String,
+      required: false,
     },
     items: [orderItemSchema],
     subtotal: {
