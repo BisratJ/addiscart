@@ -5,7 +5,11 @@ const orderItemSchema = new mongoose.Schema(
     product: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Product',
-      required: true,
+      required: false, // Optional for guest checkout
+    },
+    productId: {
+      type: String, // Store string ID for guest checkout
+      required: false,
     },
     name: {
       type: String,

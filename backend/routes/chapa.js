@@ -42,11 +42,29 @@ router.post(
       // Generate unique transaction reference
       const tx_ref = chapaService.generateTxRef();
 
+      // Transform cart items to match Order model structure
+      const transformedItems = (req.body.items || []).map(item => ({
+        productId: item.id || item.productId, // Store string ID
+        name: item.name,
+        quantity: item.quantity || 1,
+        price: item.price,
+        notes: item.notes || ''
+      }));
+
+      // Ensure delivery address has all required fields
+      const deliveryAddress = req.body.deliveryAddress || {};
+      const completeAddress = {
+        street: deliveryAddress.street || 'To be provided',
+        city: deliveryAddress.city || 'Addis Ababa',
+        state: deliveryAddress.state || 'AA',
+        zipCode: deliveryAddress.zipCode || '1000'
+      };
+
       // Create order in database with pending status
       const orderData = {
         orderNumber: tx_ref,
         store: req.body.store || null,
-        items: req.body.items || [],
+        items: transformedItems,
         subtotal: parseFloat(amount),
         tax: 0,
         deliveryFee: 0,
@@ -57,12 +75,7 @@ router.post(
         },
         paymentStatus: 'pending',
         status: 'pending',
-        deliveryAddress: req.body.deliveryAddress || {
-          street: 'Pending',
-          city: 'Addis Ababa',
-          state: 'AA',
-          zipCode: '1000'
-        },
+        deliveryAddress: completeAddress,
         chapaData: {
           tx_ref,
           currency
