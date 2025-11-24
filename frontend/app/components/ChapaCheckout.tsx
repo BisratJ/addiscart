@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 // Ensure API_URL has no trailing slash
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001/api').replace(/\/+$/, '');
+const API_URL = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001').replace(/\/+$/, '');
 
 interface ChapaCheckoutProps {
   amount: number;
@@ -82,7 +82,7 @@ export default function ChapaCheckout({
       }
 
       // Initialize payment with backend
-      const response = await fetch(`${API_URL}/chapa/initialize`, {
+      const response = await fetch(`${API_URL}/api/chapa/initialize`, {
         method: 'POST',
         headers,
         body: JSON.stringify(paymentData)
