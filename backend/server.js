@@ -23,6 +23,10 @@ const chapaRoutes = require('./routes/chapa');
 // Initialize express app
 const app = express();
 
+// Trust proxy - Required for Railway and other cloud platforms
+// This allows Express to trust the X-Forwarded-* headers from the load balancer
+app.set('trust proxy', 1);
+
 // Security Middleware
 // Set security HTTP headers
 app.use(helmet({
