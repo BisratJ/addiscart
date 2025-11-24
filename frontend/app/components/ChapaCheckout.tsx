@@ -67,8 +67,8 @@ export default function ChapaCheckout({
         items: cartItems,
         deliveryAddress,
         customization: {
-          title: 'Addiscart Order Payment',
-          description: `Payment for order of ${amount} ${currency}`
+          title: 'AddisCart',
+          description: `Order payment`
         }
       };
 

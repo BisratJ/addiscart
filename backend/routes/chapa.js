@@ -106,7 +106,7 @@ router.post(
         callback_url: `${process.env.BACKEND_URL || 'http://localhost:5001'}/api/chapa/webhook`,
         return_url: `${process.env.FRONTEND_URL || 'http://localhost:3001'}/orders/${order._id}`,
         customization: {
-          title: customization?.title || 'Addiscart Payment',
+          title: customization?.title || 'AddisCart',
           description: customization?.description || 'Order Payment',
           logo: customization?.logo
         }

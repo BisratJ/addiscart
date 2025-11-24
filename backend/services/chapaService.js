@@ -43,6 +43,16 @@ class ChapaService {
    */
   async initializePayment(paymentData) {
     try {
+      // Validate and sanitize customization title (max 16 characters per Chapa API)
+      if (paymentData.customization) {
+        const title = paymentData.customization.title || 'AddisCart';
+        paymentData.customization.title = title.substring(0, 16);
+      } else {
+        paymentData.customization = {
+          title: 'AddisCart'
+        };
+      }
+
       const response = await axios.post(
         `${this.baseURL}/transaction/initialize`,
         paymentData,
